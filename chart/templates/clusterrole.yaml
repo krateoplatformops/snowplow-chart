@@ -1,9 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "resource-tree-handler.fullname" . }}
+  name: {{ include "snowplow.fullname" . }}
   labels:
-    {{- include "resource-tree-handler.labels" . | nindent 4 }}
+    {{- include "snowplow.labels" . | nindent 4 }}
 rules:
 - apiGroups:
   - ""
