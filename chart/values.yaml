@@ -129,4 +129,4 @@ env:
   BLIZZARD: false
   SKIP: false
 
-jwtSignKeySecretName: JWT_SIGN_KEY
+jwtSignKeySecretName: jwt-sign-key
