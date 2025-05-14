@@ -128,3 +128,5 @@ env:
   DEBUG: true
   BLIZZARD: false
   SKIP: false
+
+jwtSignKeySecretName: JWT_SIGN_KEY
