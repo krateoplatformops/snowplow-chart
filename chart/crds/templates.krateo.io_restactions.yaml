@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.3
   name: restactions.templates.krateo.io
 spec:
   group: templates.krateo.io
@@ -115,6 +115,9 @@ spec:
           status:
             type: object
             x-kubernetes-preserve-unknown-fields: true
+        required:
+        - metadata
+        - spec
         type: object
     served: true
     storage: true
