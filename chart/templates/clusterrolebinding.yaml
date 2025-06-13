@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "snowplow.fullname" . }}
+  name: {{ include "snowplow.fullname" . }}-{{ .Release.Namespace }}
   labels:
     {{- include "snowplow.labels" . | nindent 4 }}
 roleRef:
@@ -10,5 +10,5 @@ roleRef:
   name: {{ include "snowplow.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: {{ include "snowplow.serviceAccountName" . }}
+  name: {{ include "snowplow.serviceAccountName" . }}-{{ .Release.Namespace }}
   namespace: {{ .Release.Namespace }}
