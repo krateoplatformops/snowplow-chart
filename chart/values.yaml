@@ -106,16 +106,10 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes:
-- name: jq-modules
-  configMap:
-    name: jq-custom-modules
+volumes: []
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts:
-- name: jq-modules
-  mountPath: /jq-modules
-  readOnly: true
+volumeMounts: []
 
 nodeSelector: {}
 
@@ -124,7 +118,7 @@ tolerations: []
 affinity: {}
 
 env:
-  DEBUG: true
+  DEBUG: false
   BLIZZARD: false
   SKIP: false
   JQ_MODULES_PATH: /jq-modules

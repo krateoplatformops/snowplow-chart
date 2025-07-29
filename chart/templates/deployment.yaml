@@ -53,10 +53,16 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
+            - name: jq-modules
+              mountPath: /jq-modules
+              readOnly: true
             {{- toYaml . | nindent 12 }}
           {{- end }}
       {{- with .Values.volumes }}
       volumes:
+        - name: jq-modules
+          configMap:
+            name: {{ include "snowplow.fullname" . }}-jq-custom-modules
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
