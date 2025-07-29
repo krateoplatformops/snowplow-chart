@@ -106,17 +106,16 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+- name: jq-modules
+  configMap:
+    name: jq-custom-modules
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+- name: jq-modules
+  mountPath: /jq-modules
+  readOnly: true
 
 nodeSelector: {}
 
@@ -128,5 +127,6 @@ env:
   DEBUG: true
   BLIZZARD: false
   SKIP: false
+  JQ_MODULES_PATH: /jq-modules
 
 jwtSignKeySecretName: jwt-sign-key
