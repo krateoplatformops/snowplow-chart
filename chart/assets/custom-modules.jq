@@ -1,20 +1,48 @@
-def shout($s): ($s | ascii_upcase + "!!!");
+def update_string_schema_defaults($input):
+  $input as $root
+  | ($root.getNotOrderedSchema | tostring | gsub("\\s{2,}"; " ")) as $schema
+  | reduce (
+      $root.getCompositionSpec
+      | paths(scalars)
+    ) as $p
+    (
+      $schema;
+      . as $current
+      | ($root.getCompositionSpec | getpath($p)) as $newValue
+      | ($newValue | tojson) as $replacement
+      | ($p | last) as $lastKey
+      | ($p | (length-2) | if .>=0 then $p[.] else null end) as $parentKey
+      | if ($parentKey != null) then
+          $current
+          | gsub(
+              "(?<prefix>\"" + $parentKey + "\".*?\"" + $lastKey + "\"\\s*:\\s*\\{.*?\"default\"\\s*:\\s*)(\"[^\"]*\"|-?[0-9]+(?:\\.[0-9]+)?|true|false|null)(?<suffix>.*?\"title\"\\s*:\\s*\"" + $lastKey + "\".*?\\})";
+              "\(.prefix)\($replacement)\(.suffix)"
+            )
+        else
+          $current
+          | gsub(
+              "(?<prefix>\"" + $lastKey + "\"\\s*:\\s*\\{.*?\"default\"\\s*:\\s*)(\"[^\"]*\"|-?[0-9]+(?:\\.[0-9]+)?|true|false|null)(?<suffix>.*?\"title\"\\s*:\\s*\"" + $lastKey + "\".*?\\})";
+              "\(.prefix)\($replacement)\(.suffix)"
+            )
+        end
+    )
+;
 
-def flipchar($c):
-  {
-    "a": "ɐ", "b": "q", "c": "ɔ", "d": "p", "e": "ǝ", "f": "ɟ", "g": "ƃ", "h": "ɥ", "i": "ᴉ",
-    "j": "ɾ", "k": "ʞ", "l": "ʃ", "m": "ɯ", "n": "u", "o": "o", "p": "d", "q": "b", "r": "ɹ",
-    "s": "s", "t": "ʇ", "u": "n", "v": "ʌ", "w": "ʍ", "x": "x", "y": "ʎ", "z": "z",
-    "A": "∀", "B": "𐐒", "C": "Ɔ", "D": "p", "E": "Ǝ", "F": "Ⅎ", "G": "פ", "H": "H",
-    "I": "I", "J": "ſ", "K": "ʞ", "L": "˥", "M": "W", "N": "N", "O": "O", "P": "Ԁ",
-    "Q": "Q", "R": "ᴚ", "S": "S", "T": "┴", "U": "∩", "V": "Λ", "W": "M", "X": "X",
-    "Y": "⅄", "Z": "Z", ".": "˙", ",": "'", "'": ",", "\"": ",,", "_": "‾", "?": "¿",
-    "!": "¡", "(": ")", ")": "(", "[": "]", "]": "[", "{": "}", "}": "{"
-  }[$c] // $c;
-
-def flip($s):
-  $s
-  | explode
-  | map([.] | implode | flipchar(.))
-  | reverse
-  | join("");
+def update_schema_defaults($input):
+  $input as $root
+  | ($root.getOrderedSchema) as $schema
+  | reduce (
+      $root.getCompositionSpec
+      | paths(scalars)
+    ) as $p
+    (
+      $schema;
+      ($root.getCompositionSpec | getpath($p)) as $newValue
+      | (
+          ([$p[] | ["properties", .]] | add)
+          + ["default"]
+        ) as $schemaPath
+      | setpath($schemaPath; $newValue)
+    )
+  | del(.properties.composition)
+;
