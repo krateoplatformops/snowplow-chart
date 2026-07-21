@@ -35,8 +35,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "snowplow.fullname" . }}
-            - secretRef:
-                name: {{ .Values.jwtSignKeySecretName }}
+          env:
+            - name: JWT_PUBLIC_KEY_FILE
+              value: "{{ .Values.jwt.mountPath }}/{{ .Values.jwt.publicKeySecretKey }}"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -55,6 +56,9 @@ spec:
             - name: jq-modules
               mountPath: /jq-modules
               readOnly: true
+            - name: jwt-public-key
+              mountPath: {{ .Values.jwt.mountPath }}
+              readOnly: true
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -62,6 +66,13 @@ spec:
         - name: jq-modules
           configMap:
             name: {{ include "snowplow.fullname" . }}-jq-custom-modules
+        # authn's RSA public key (PEM), used to verify RS256 JWT signatures.
+        - name: jwt-public-key
+          secret:
+            secretName: {{ .Values.jwt.publicKeySecretName }}
+            items:
+              - key: {{ .Values.jwt.publicKeySecretKey }}
+                path: {{ .Values.jwt.publicKeySecretKey }}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}

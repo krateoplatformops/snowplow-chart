@@ -123,4 +123,15 @@ env:
   SKIP: false
   JQ_MODULES_PATH: /jq-modules
 
-jwtSignKeySecretName: jwt-sign-key
+# JWT verification key configuration.
+# snowplow verifies RS256 JWTs issued by authn using authn's RSA *public* key.
+# The public key is mounted from a Secret as a file (exposed via
+# JWT_PUBLIC_KEY_FILE); snowplow does not hold any private/signing key.
+jwt:
+  # Name of the Secret holding authn's PEM-encoded RSA public key.
+  publicKeySecretName: authn-jwt-public-key
+  # Key inside that Secret whose value is the PEM public key; also the mounted
+  # filename. Read as <mountPath>/<publicKeySecretKey>.
+  publicKeySecretKey: public.pem
+  # Directory the Secret is mounted into.
+  mountPath: /etc/snowplow/jwt
